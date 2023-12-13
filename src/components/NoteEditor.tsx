@@ -32,7 +32,7 @@ function NoteEditor() {
           // setEditingNotedetails(true);
         }}
       />
-      <MarkDownEditor/>
+      <MarkDownEditor noteID={selectedNoteID} />
     </div>
   );
 }
