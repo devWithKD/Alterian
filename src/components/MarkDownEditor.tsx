@@ -1,14 +1,19 @@
 import { EditorView, basicSetup } from "codemirror";
 import { useEffect, useRef } from "react";
 import { Compartment, EditorState } from "@codemirror/state";
-import { markdown } from "@codemirror/lang-markdown";
+import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { syntaxHighlighting } from "@codemirror/language";
 import modedDefaultHightLightStyle from "../CodeMirror/HighlightStyles/moddedDefault";
 import lightTheme from "../CodeMirror/Themes/lightTheme";
-import markdownHighlightStyle from "../CodeMirror/HighlightStyles/markdownHighlightStyle";
+import markdownHighlightStyle, {
+  MarkStylingExtention,
+} from "../CodeMirror/HighlightStyles/markdownHighlightStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { updateBody } from "../state/notes/notesSlice";
+import FoldableHeadings, {
+  FoldableHeadingsTheme,
+} from "../CodeMirror/HighlightStyles/headingFold";
 
 interface MarkDownEditorProps {
   noteID: string;
@@ -36,9 +41,13 @@ function MarkDownEditor(props: MarkDownEditorProps) {
     doc: noteBody,
     extensions: [
       basicSetup,
-      language.of(markdown()),
+      language.of(
+        markdown({ base: markdownLanguage, extensions: [MarkStylingExtention] })
+      ),
       lightTheme,
       onBlur,
+      FoldableHeadings,
+      FoldableHeadingsTheme,
       syntaxHighlighting(markdownHighlightStyle),
       syntaxHighlighting(modedDefaultHightLightStyle),
     ],
