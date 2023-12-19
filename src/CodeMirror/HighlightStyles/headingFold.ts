@@ -57,8 +57,6 @@ const headingMatcher = new MatchDecorator({
   regexp: /^#{1,6}\s(?!\s|#)/g,
   // regexp: /^#{1,6}\s/g,
   decoration: (match) => {
-    console.log(match);
-
     return Decoration.replace({ widget: new NullWidget(match) });
   },
 });

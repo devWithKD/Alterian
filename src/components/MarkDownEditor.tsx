@@ -5,12 +5,12 @@ import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { syntaxHighlighting } from "@codemirror/language";
 import modedDefaultHightLightStyle from "../CodeMirror/HighlightStyles/moddedDefault";
 import lightTheme from "../CodeMirror/Themes/lightTheme";
-import markdownHighlightStyle, {
-  MarkStylingExtention,
-} from "../CodeMirror/HighlightStyles/markdownHighlightStyle";
+import markdownHighlightStyle from "../CodeMirror/HighlightStyles/markdownHighlightStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { updateBody } from "../state/notes/notesSlice";
+// import CodeBlockPlugin,{codeBlockTheme} from "../CodeMirror/HighlightStyles/codeblock";
+import CodeBlockField, { codeBlockTheme } from "../CodeMirror/HighlightStyles/codeblock";
 import FoldableHeadings, {
   FoldableHeadingsTheme,
 } from "../CodeMirror/HighlightStyles/headingFold";
@@ -42,12 +42,15 @@ function MarkDownEditor(props: MarkDownEditorProps) {
     extensions: [
       basicSetup,
       language.of(
-        markdown({ base: markdownLanguage, extensions: [MarkStylingExtention] })
+        markdown({ base: markdownLanguage, extensions: [] })
       ),
       lightTheme,
       onBlur,
       FoldableHeadings,
       FoldableHeadingsTheme,
+      CodeBlockField,
+      // CodeBlockPlugin,
+      codeBlockTheme,
       syntaxHighlighting(markdownHighlightStyle),
       syntaxHighlighting(modedDefaultHightLightStyle),
     ],

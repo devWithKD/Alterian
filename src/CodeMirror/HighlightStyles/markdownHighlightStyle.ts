@@ -1,5 +1,21 @@
 import { HighlightStyle } from "@codemirror/language";
-import { tags } from "@lezer/highlight";
+import { tags, Tag, styleTags } from "@lezer/highlight";
+import { MarkdownConfig } from "@lezer/markdown";
+
+
+///  Debug ///
+// const customTags = {
+//   CodeInfo: Tag.define(),
+// }
+ 
+// export const CodeBlockStyling: MarkdownConfig = {
+//   props: [
+//     styleTags({
+//       CodeInfo: customTags.CodeInfo
+//     })
+//   ]
+// }
+///  Debug ///
 
 const markdownHighlightStyle = HighlightStyle.define([
   { tag: tags.heading, textDecoration: "none" },
@@ -9,6 +25,7 @@ const markdownHighlightStyle = HighlightStyle.define([
   { tag: tags.heading4, fontSize: "100%", fontWeight: "bolder" },
   { tag: tags.heading5, fontSize: "83%", fontWeight: "bolder" },
   { tag: tags.heading6, fontSize: "67%", fontWeight: "bolder" },
+  // {tag: customTags.CodeInfo, display: "none"} // Debug
 ]);
 
 export default markdownHighlightStyle;
