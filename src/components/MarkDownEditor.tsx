@@ -10,10 +10,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { updateBody } from "../state/notes/notesSlice";
 // import CodeBlockPlugin,{codeBlockTheme} from "../CodeMirror/HighlightStyles/codeblock";
-import CodeBlockField, { codeBlockTheme } from "../CodeMirror/HighlightStyles/codeblock";
+import CodeBlockField, {
+  codeBlockTheme,
+} from "../CodeMirror/HighlightStyles/codeblock";
 import FoldableHeadings, {
   FoldableHeadingsTheme,
 } from "../CodeMirror/HighlightStyles/headingFold";
+import {
+  FoldEmphasisTags,
+  FoldStrikeTags,
+  FoldStrongTags,
+  FoldUnderlineTags,
+} from "../CodeMirror/HighlightStyles/textdecorationfolds";
 
 interface MarkDownEditorProps {
   noteID: string;
@@ -41,13 +49,15 @@ function MarkDownEditor(props: MarkDownEditorProps) {
     doc: noteBody,
     extensions: [
       basicSetup,
-      language.of(
-        markdown({ base: markdownLanguage, extensions: [] })
-      ),
+      language.of(markdown({ base: markdownLanguage, extensions: [] })),
       lightTheme,
       onBlur,
       FoldableHeadings,
       FoldableHeadingsTheme,
+      FoldStrongTags,
+      FoldStrikeTags,
+      FoldEmphasisTags,
+      FoldUnderlineTags,
       CodeBlockField,
       // CodeBlockPlugin,
       codeBlockTheme,

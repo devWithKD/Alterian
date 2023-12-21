@@ -1,6 +1,8 @@
 import { HighlightStyle } from "@codemirror/language";
-import { tags, Tag, styleTags } from "@lezer/highlight";
-import { MarkdownConfig } from "@lezer/markdown";
+import { tags, 
+  // Tag, styleTags 
+} from "@lezer/highlight";
+// import { MarkdownConfig } from "@lezer/markdown";
 
 
 ///  Debug ///
