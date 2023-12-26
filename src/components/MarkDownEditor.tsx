@@ -17,10 +17,12 @@ import FoldableHeadings, {
   FoldableHeadingsTheme,
 } from "../CodeMirror/HighlightStyles/headingFold";
 import {
+  CustomTextTheme,
   FoldEmphasisTags,
   FoldStrikeTags,
   FoldStrongTags,
   FoldUnderlineTags,
+  BulletedListTags,
 } from "../CodeMirror/HighlightStyles/textdecorationfolds";
 
 interface MarkDownEditorProps {
@@ -52,6 +54,7 @@ function MarkDownEditor(props: MarkDownEditorProps) {
       language.of(markdown({ base: markdownLanguage, extensions: [] })),
       lightTheme,
       onBlur,
+      CustomTextTheme,
       FoldableHeadings,
       FoldableHeadingsTheme,
       FoldStrongTags,
@@ -59,6 +62,7 @@ function MarkDownEditor(props: MarkDownEditorProps) {
       FoldEmphasisTags,
       FoldUnderlineTags,
       CodeBlockField,
+      BulletedListTags,
       // CodeBlockPlugin,
       codeBlockTheme,
       syntaxHighlighting(markdownHighlightStyle),
@@ -75,7 +79,7 @@ function MarkDownEditor(props: MarkDownEditorProps) {
     return () => {
       editor.destroy();
     };
-  }, [state]);
+  });
   return <div ref={editorRef}></div>;
 }
 

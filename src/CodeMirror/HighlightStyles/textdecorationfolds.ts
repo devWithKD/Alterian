@@ -15,20 +15,21 @@ class CustomWidget extends WidgetType {
     super();
   }
   eq(other: CustomWidget) {
-    return this.visibleVal === other.visibleVal;
+    return this.type !== other.type;
   }
   toDOM(): HTMLElement {
     const span = document.createElement("span");
-    const substring = document.createElement(
+    span.className = "cm-custom-text";
+    const substring = document.createElement("span");
+    substring.className =
       this.type === "bold"
-        ? "strong"
+        ? "cm-strong"
         : this.type === "strikethrough"
-        ? "s"
+        ? "cm-strikethrough"
         : this.type === "italic"
-        ? "em"
-        : "u"
-    );
-    console.log(this.type);
+        ? "cm-emphasis"
+        : "cm-underline";
+
     substring.innerText = this.visibleVal;
     span.appendChild(substring);
     return span;
@@ -37,6 +38,21 @@ class CustomWidget extends WidgetType {
     return false;
   }
 }
+
+export const CustomTextTheme = EditorView.baseTheme({
+  ".cm-strong": {
+    fontWeight: "bold",
+  },
+  ".cm-strikethrough": {
+    textDecoration: "line-through",
+  },
+  ".cm-emphasis": {
+    fontStyle: "italic",
+  },
+  ".cm-underline": {
+    textDecoration: "underline",
+  },
+});
 
 /////////////////// StrikeThrough Synteax /////////////////////////////
 
@@ -77,7 +93,7 @@ export const FoldStrikeTags = ViewPlugin.fromClass(
 const StrongTagMatcher = new MatchDecorator({
   regexp: /\*\*(.*?)\*\*/g,
   decoration(match) {
-    const strongText = new CustomWidget(match[1],"bold");
+    const strongText = new CustomWidget(match[1], "bold");
     return Decoration.widget({ widget: strongText });
   },
 });
@@ -108,26 +124,29 @@ export const FoldStrongTags = ViewPlugin.fromClass(
 const EmphasisTagMatcher = new MatchDecorator({
   regexp: /(?<!\*)\*([^*\r\n\s].*?)\*/g,
   decoration(match) {
-    const strongText = new CustomWidget(match[1],"italic");
-    return Decoration.widget({ widget: strongText });
+    const emphasisText = new CustomWidget(match[1], "italic");
+    return Decoration.widget({ widget: emphasisText });
   },
 });
 
 export const FoldEmphasisTags = ViewPlugin.fromClass(
   class {
-    foldStrongs: DecorationSet;
+    foldEmphasis: DecorationSet;
     constructor(readonly view: EditorView) {
-      this.foldStrongs = EmphasisTagMatcher.createDeco(view);
+      this.foldEmphasis = EmphasisTagMatcher.createDeco(view);
     }
     update(update: ViewUpdate) {
-      this.foldStrongs = EmphasisTagMatcher.updateDeco(update, this.foldStrongs);
+      this.foldEmphasis = EmphasisTagMatcher.updateDeco(
+        update,
+        this.foldEmphasis
+      );
     }
   },
   {
-    decorations: (state) => state.foldStrongs,
+    decorations: (state) => state.foldEmphasis,
     provide: (plugin) =>
       EditorView.decorations.of(
-        (view) => view.plugin(plugin)?.foldStrongs || Decoration.none
+        (view) => view.plugin(plugin)?.foldEmphasis || Decoration.none
       ),
   }
 );
@@ -139,30 +158,74 @@ export const FoldEmphasisTags = ViewPlugin.fromClass(
 const UnderlineTagMatcher = new MatchDecorator({
   regexp: /<u>(.*?)<\/u>/g,
   decoration(match) {
-    const strongText = new CustomWidget(match[1],"underline");
-    return Decoration.widget({ widget: strongText });
+    const underlineText = new CustomWidget(match[1], "underline");
+    return Decoration.widget({ widget: underlineText });
   },
 });
 
 export const FoldUnderlineTags = ViewPlugin.fromClass(
   class {
-    foldStrongs: DecorationSet;
+    foldUnderlines: DecorationSet;
     constructor(readonly view: EditorView) {
-      this.foldStrongs = UnderlineTagMatcher.createDeco(view);
+      this.foldUnderlines = UnderlineTagMatcher.createDeco(view);
     }
     update(update: ViewUpdate) {
-      this.foldStrongs = UnderlineTagMatcher.updateDeco(update, this.foldStrongs);
+      this.foldUnderlines = UnderlineTagMatcher.updateDeco(
+        update,
+        this.foldUnderlines
+      );
     }
   },
   {
-    decorations: (state) => state.foldStrongs,
+    decorations: (state) => state.foldUnderlines,
     provide: (plugin) =>
       EditorView.decorations.of(
-        (view) => view.plugin(plugin)?.foldStrongs || Decoration.none
+        (view) => view.plugin(plugin)?.foldUnderlines || Decoration.none
       ),
   }
 );
 
 //////////////////////////////////////////////////////////////////////////
 
-// (?:\*\*|~~|\*)((?:\*\*|~~|\*)?[^*~]+(?:\*\*|~~|\*)?)(?:\*\*|~~|\*)
+/////////////////////////// Bulleted List ////////////////////////////////
+
+class BulletedListItem extends WidgetType {
+  constructor() {
+    super();
+  }
+  toDOM(): HTMLElement {
+    const span = document.createElement("span");
+    span.innerText = "• ";
+    span.className = "cm-custombullet";
+    return span;
+  }
+}
+
+const bulletedListTagMatcher = new MatchDecorator({
+  regexp: /^-\s(?!\s|-)/g,
+  decoration() {
+    return Decoration.replace({ widget: new BulletedListItem() });
+  },
+});
+
+export const BulletedListTags = ViewPlugin.fromClass(
+  class {
+    bulletedListItems: DecorationSet;
+    constructor(readonly view: EditorView) {
+      this.bulletedListItems = bulletedListTagMatcher.createDeco(view);
+    }
+    update(update: ViewUpdate) {
+      this.bulletedListItems = bulletedListTagMatcher.updateDeco(
+        update,
+        this.bulletedListItems
+      );
+    }
+  },
+  {
+    decorations: (state) => state.bulletedListItems,
+    provide: (plugin) =>
+      EditorView.decorations.of(
+        (view) => view.plugin(plugin)?.bulletedListItems || Decoration.none
+      ),
+  }
+);
