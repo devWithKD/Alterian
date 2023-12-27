@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
+import { MdOutlineNoteAdd, MdOutlineSort } from "react-icons/md";
+import { LuFolderPlus } from "react-icons/lu";
+import { BiCollapseVertical, BiExpandVertical } from "react-icons/bi";
+import useCreateNewNote from "../utils/useCreateNewNote";
+
 function Sidebar() {
   const [open, setOpen] = useState(false);
+  const createNewNote = useCreateNewNote();
   return (
     <div
       className={`shadow-md ${
@@ -13,15 +19,33 @@ function Sidebar() {
     >
       {open ? (
         <div className="flex flex-col gap-4">
-          <button
-            className="flex m-2 justify-center items-center w-fit"
-            onClick={() => {
-              open ? setOpen(false) : null;
-            }}
-          >
-            <AiOutlineMenu size={22} />
-          </button>
-          <div className="w-56 flex-grow">Hello</div>
+          <div className="flex flex-grow relative">
+            <button
+              className="flex absolute top-0 left-0 m-2 justify-center items-center w-fit"
+              onClick={() => {
+                open ? setOpen(false) : null;
+              }}
+            >
+              <AiOutlineMenu size={22} />
+            </button>
+            <div className="flex flex-grow justify-center items-center">
+              <button className="m-2" onClick={createNewNote}>
+                <MdOutlineNoteAdd size={22} />
+              </button>
+              <button className="m-2">
+                <LuFolderPlus size={22} />
+              </button>
+              <button className="m-2">
+                {" "}
+                <MdOutlineSort size={22} />
+              </button>
+              <button className="m-2">
+                <BiExpandVertical size={22} />
+              </button>
+            </div>
+          </div>
+
+          <div className="w-72 flex-grow">Hello</div>
         </div>
       ) : (
         <button className="flex m-2 justify-center items-center">

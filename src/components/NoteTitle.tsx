@@ -1,27 +1,22 @@
-import { useState } from "react";
-import { Note } from "../interface";
 import { updateNoteTitle } from "../state/notes/notesSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../state/store";
 
-interface props {
-  note: Note;
-  id: string;
-  onBlur: ()=>void
-  onClick: ()=>void
-}
-
-function NoteTitle(props: props) {
-  const [title, setTitle] = useState(props.note.title);
+function NoteTitle() {
+  const selectedID = useSelector((state: RootState) => state.currentNote.id);
+  const title = useSelector(
+    (state: RootState) =>
+      state.notes.filter((note) => note.id === selectedID)[0].title
+  );
   const dispatch = useDispatch();
 
   const onChange = (val: string) => {
-    setTitle(val);
     updateTitle(val);
   };
   const updateTitle = (val: string) => {
     dispatch(
       updateNoteTitle({
-        id: props.id,
+        id: selectedID,
         title: val,
       })
     );
@@ -32,13 +27,11 @@ function NoteTitle(props: props) {
       className="text-5xl bg-inherit font-extrabold focus:outline-none mb-4"
       onBlur={(e) => {
         onChange(e.target.value);
-        props.onBlur();
       }}
       onChange={(e) => {
         onChange(e.target.value);
       }}
-      onClick={props.onClick}
-      defaultValue={title}
+      value={title}
     />
   );
 }
