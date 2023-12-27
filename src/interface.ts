@@ -13,7 +13,7 @@ export interface Tag {
 
 export interface Collection {
   id: string;
-  noteIDs: Array<Note>;
+  noteIDs: Array<string>;
   label: string;
 }
 

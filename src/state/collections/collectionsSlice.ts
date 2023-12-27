@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { CollectionsState } from "../../interface";
-import { v4 as uuidV4 } from "uuid";
+// import { v4 as uuidV4 } from "uuid";
 
 const initialState: CollectionsState = [];
 
@@ -10,7 +10,7 @@ const collectionsSlice = createSlice({
   reducers: {
     // Create expects object consisting label and array of Note IDs as payload
     createCollection: (state, action) => {
-      state.push({ ...action.payload, id: uuidV4() });
+      state.push({ ...action.payload });
     },
     // Delete expects Collection ID as payload
     deleteCollection: (state, action) => {

@@ -4,10 +4,12 @@ import { MdOutlineNoteAdd, MdOutlineSort } from "react-icons/md";
 import { LuFolderPlus } from "react-icons/lu";
 import { BiCollapseVertical, BiExpandVertical } from "react-icons/bi";
 import useCreateNewNote from "../utils/useCreateNewNote";
+import useCreateCollection from "../utils/useCreateCollection";
 
 function Sidebar() {
   const [open, setOpen] = useState(false);
   const createNewNote = useCreateNewNote();
+  const [newCollectionID, createCollection] = useCreateCollection();
   return (
     <div
       className={`shadow-md ${
@@ -32,7 +34,7 @@ function Sidebar() {
               <button className="m-2" onClick={createNewNote}>
                 <MdOutlineNoteAdd size={22} />
               </button>
-              <button className="m-2">
+              <button className="m-2" onClick={createCollection}>
                 <LuFolderPlus size={22} />
               </button>
               <button className="m-2">
@@ -40,7 +42,7 @@ function Sidebar() {
                 <MdOutlineSort size={22} />
               </button>
               <button className="m-2">
-                <BiExpandVertical size={22} />
+                <BiExpandVertical size={18} />
               </button>
             </div>
           </div>

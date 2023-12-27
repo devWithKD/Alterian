@@ -1,6 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { NotesState } from "../../interface";
-import { v4 as uuidV4 } from "uuid";
 
 const initialState: NotesState = [];
 
@@ -8,12 +7,12 @@ const notesSlice = createSlice({
   name: "notes",
   initialState,
   reducers: {
-    // CreateNote expects object consisting body and tagIDs as payload
-    createNote: (state, action) => {
-      state.push({ ...action.payload, id: uuidV4() });
-    },
+    // // CreateNote expects object consisting body and tagIDs as payload
+    // createNote: (state, action) => {
+    //   state.push({ ...action.payload, id: uuidV4() });
+    // },
     // CreateNoteWithID expects object consisting Note ID, body and tagIDs as payload
-    createNoteWithID: (state, action) => {
+    createNote: (state, action) => {
       state.push(action.payload);
     },
     // Delete expects Note ID as payload
@@ -62,8 +61,8 @@ const notesSlice = createSlice({
 });
 
 export const {
+  // createNote,
   createNote,
-  createNoteWithID,
   deleteNote,
   updateNoteTitle,
   updateBody,

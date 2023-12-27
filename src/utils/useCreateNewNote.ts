@@ -1,7 +1,7 @@
 import { v4 as uuidV4 } from "uuid";
 import { useDispatch } from "react-redux";
 import { Note } from "../interface";
-import { createNoteWithID } from "../state/notes/notesSlice";
+import { createNote } from "../state/notes/notesSlice";
 import { setCurrentNote } from "../state/currentNote/currentNoteSlice";
 
 const useCreateNewNote = () => {
@@ -15,7 +15,7 @@ const useCreateNewNote = () => {
       tagIDs: [],
       parentID: "",
     };
-    dispatch(createNoteWithID(note));
+    dispatch(createNote(note));
     dispatch(setCurrentNote({ id }));
   };
 };
