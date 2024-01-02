@@ -1,26 +1,28 @@
-import { updateNoteTitle } from "../state/notes/notesSlice";
+// import { updateNoteTitle } from "../state/notes/notesSlice";
+
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
+import { updateTitle } from "../state/nodes/nodeSlice";
 
 function NoteTitle() {
   const selectedID = useSelector((state: RootState) => state.currentNote.id);
   const title = useSelector(
     (state: RootState) =>
-      state.notes.filter((note) => note.id === selectedID)[0].title
+      state.nodes.filter((node) => node.id === selectedID)[0].title
   );
   const dispatch = useDispatch();
-
-  const onChange = (val: string) => {
-    updateTitle(val);
-  };
-  const updateTitle = (val: string) => {
+  const updateNoteTitle = (val: string) => {
     dispatch(
-      updateNoteTitle({
+      updateTitle({
         id: selectedID,
         title: val,
       })
     );
   };
+  const onChange = (val: string) => {
+    updateNoteTitle(val);
+  };
+
   return (
     <input
       type="text"

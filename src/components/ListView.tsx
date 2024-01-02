@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux";
 import NoteView from "./NoteView";
-import { getNoteIDs } from "../state/notes/notesSlice";
-import { getCollectionIDs } from "../state/collections/collectionsSlice";
+// import { getNoteIDs } from "../state/notes/notesSlice";
+// import { getCollectionIDs } from "../state/collections/collectionsSlice";
 import CollectionView from "./CollectionView";
 import { ReactElement } from "react";
 import { RootState } from "../state/store";
+import { getCollectionIDs, getNoteIDs } from "../state/nodes/nodeSlice";
 
 function ListView() {
   const rawNoteIDs = useSelector(getNoteIDs);
