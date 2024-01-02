@@ -11,10 +11,17 @@ export interface Tag {
   label: string;
 }
 
+export interface SideBarState {
+  focusedID: string | null;
+  sortType: string;
+  expandedView: string;
+}
+
 export interface Collection {
   id: string;
-  noteIDs: Array<string>;
+  // noteIDs: Array<string>;
   label: string;
+  parentID: string;
 }
 
 export interface NotesState extends Array<Note> {}

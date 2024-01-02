@@ -3,6 +3,7 @@ import notesReducer from "./notes/notesSlice";
 import tagsReducer from "./tags/tagsSclice";
 import collectionsReducer from "./collections/collectionsSlice";
 import currentNoteReducer from "./currentNote/currentNoteSlice";
+import sidebarStateReducer from "./sidebar/sidebarSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     tags: tagsReducer,
     collections: collectionsReducer,
     currentNote: currentNoteReducer,
+    sidebarState: sidebarStateReducer,
   },
 });
 

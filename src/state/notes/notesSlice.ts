@@ -1,5 +1,6 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice, createSelector } from "@reduxjs/toolkit";
 import { NotesState } from "../../interface";
+import { RootState } from "../store";
 
 const initialState: NotesState = [];
 
@@ -59,6 +60,10 @@ const notesSlice = createSlice({
     },
   },
 });
+
+const selectNotes = (state:RootState) => state.notes;
+
+export const getNoteIDs = createSelector([selectNotes],(notes)=>notes.map(note=>({id:note.id})))
 
 export const {
   // createNote,
