@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { useRef, useState } from "react";
-import { updateNoteTitle } from "../state/notes/notesSlice";
+// import { updateNoteTitle } from "../state/notes/notesSlice";
 import { setCurrentNote } from "../state/currentNote/currentNoteSlice";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../utils/itemTypes";
+import { updateTitle } from "../state/nodes/nodeSlice";
 
 interface props {
   noteID: string;
@@ -12,13 +13,14 @@ interface props {
 
 function NoteView(props: props) {
   const title = useSelector((state: RootState) => {
-    return state.notes.filter((note) => note.id === props.noteID)[0].title;
+    return state.nodes.filter((node) => node.id === props.noteID)[0].title;
   });
   const dispatch = useDispatch();
   const [isEditable, setEditable] = useState(false);
 
-  const updateTitle = (e: React.FocusEvent<HTMLDivElement, Element>) => {
-    dispatch(updateNoteTitle({ id: props.noteID, title: e.target.innerText }));
+  const updateNoteTitle = (e: React.FocusEvent<HTMLDivElement, Element>) => {
+    // dispatch(updateNoteTitle({ id: props.noteID, title: e.target.innerText }));
+    dispatch(updateTitle({ id: props.noteID, title: e.target.innerText }));
   };
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.detail == 2) {
@@ -53,7 +55,7 @@ function NoteView(props: props) {
         onBlur={(e) => {
           // console.log("blur");
           setEditable(false);
-          updateTitle(e);
+          updateNoteTitle(e);
         }}
         onClick={(e) => handleClick(e)}
         ref={titleRef}

@@ -1,12 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { useEffect, useRef, useState } from "react";
-import { updateLabel } from "../state/collections/collectionsSlice";
+// import { updateLabel } from "../state/collections/collectionsSlice";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "../utils/itemTypes";
-import { updateParent } from "../state/notes/notesSlice";
+// import { updateParent } from "../state/notes/notesSlice";
 import { updateFocusedID } from "../state/sidebar/sidebarSlice";
+import { updateParent, updateTitle } from "../state/nodes/nodeSlice";
 
 interface props {
   collectionID: string;
@@ -19,11 +20,11 @@ interface noteItem {
 
 function CollectionView(props: props) {
   const [isExpanded, SetExpanded] = useState(props.expand);
-  
+
   const title = useSelector((state: RootState) => {
-    return state.collections.filter(
+    return state.nodes.filter(
       (collection) => collection.id === props.collectionID
-    )[0].label;
+    )[0].title;
   });
   const focusedID = useSelector(
     (state: RootState) => state.sidebarState.focusedID
@@ -31,7 +32,7 @@ function CollectionView(props: props) {
 
   const dispatch = useDispatch();
 
-  const [isEditable, setEditable] = useState(false);
+  const [isEditable, setEditable] = useState(focusedID === props.collectionID);
 
   const [, drop] = useDrop(() => ({
     accept: ItemTypes.NOTE_ITEM,
@@ -40,10 +41,10 @@ function CollectionView(props: props) {
     },
   }));
 
-  const updateLabelText = (e: React.FocusEvent<HTMLDivElement, Element>) => {
+  const updateTitleText = (e: React.FocusEvent<HTMLDivElement, Element>) => {
     console.log(e.target.innerText, props.collectionID);
     dispatch(
-      updateLabel({ id: props.collectionID, label: e.target.innerText })
+      updateTitle({ id: props.collectionID, title: e.target.innerText })
     );
   };
 
@@ -64,8 +65,20 @@ function CollectionView(props: props) {
   const titleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setEditable(props.collectionID === focusedID);
+    const bool = props.collectionID === focusedID;
+    setEditable(bool);
   }, [focusedID, props.collectionID]);
+
+  useEffect(() => {
+    if (focusedID === props.collectionID && titleRef.current) {
+      titleRef.current.focus();
+      const range = document.createRange()
+      range.selectNodeContents(titleRef.current)
+      const sel = window.getSelection()
+      sel?.removeAllRanges()
+      sel?.addRange(range)
+    }
+  });
 
   return (
     <div
@@ -76,8 +89,8 @@ function CollectionView(props: props) {
       onBlur={(e) => {
         // console.log("blur");
         dispatch(updateFocusedID(null));
-        setEditable(false);
-        updateLabelText(e);
+        // setEditable(false);
+        updateTitleText(e);
       }}
     >
       <div className="flex gap-2 items-center">
@@ -95,6 +108,12 @@ function CollectionView(props: props) {
           ref={titleRef}
           onKeyDown={(e) => handleKeyPress(e)}
           suppressContentEditableWarning={true}
+          // onBlur={(e) => {
+          //   // console.log("blur");
+          //   dispatch(updateFocusedID(null));
+          //   // setEditable(false);
+          //   updateTitleText(e);
+          // }}
         >
           {title}
         </div>

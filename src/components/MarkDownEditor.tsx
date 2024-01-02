@@ -8,7 +8,7 @@ import lightTheme from "../CodeMirror/Themes/lightTheme";
 import markdownHighlightStyle from "../CodeMirror/HighlightStyles/markdownHighlightStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
-import { updateBody } from "../state/notes/notesSlice";
+// import { updateBody } from "../state/notes/notesSlice";
 // import CodeBlockPlugin,{codeBlockTheme} from "../CodeMirror/HighlightStyles/codeblock";
 import CodeBlockField, {
   codeBlockTheme,
@@ -24,6 +24,8 @@ import {
   FoldUnderlineTags,
   BulletedListTags,
 } from "../CodeMirror/HighlightStyles/textdecorationfolds";
+import { Note } from "../interface";
+import { updateBody } from "../state/nodes/nodeSlice";
 
 interface MarkDownEditorProps {
   noteID: string;
@@ -31,7 +33,7 @@ interface MarkDownEditorProps {
 
 function MarkDownEditor(props: MarkDownEditorProps) {
   const noteBody = useSelector((state: RootState) => {
-    const note = state.notes.filter((_note) => _note.id === props.noteID)[0];
+    const note = state.nodes.filter((node) => node.id === props.noteID)[0] as Note;
     return note.body;
   });
   const dispatch = useDispatch();
