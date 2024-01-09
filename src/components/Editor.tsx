@@ -6,7 +6,7 @@ import NoteEditor from "./NoteEditor";
 function Editor() {
   const currentNote = useSelector((state: RootState) => state.currentNote);
   return (
-    <div className="w-full h-full flex justify-center -translate-x-9">
+    <div className="w-full h-full flex justify-center">
       {currentNote.id === "" ? <NoteCreator /> : <NoteEditor />}
     </div>
   );

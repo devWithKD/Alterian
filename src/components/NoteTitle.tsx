@@ -1,44 +1,39 @@
-import { useState } from "react";
-import { Note } from "../interface";
-import { updateNoteTitle } from "../state/notes/notesSlice";
-import { useDispatch } from "react-redux";
+// import { updateNoteTitle } from "../state/notes/notesSlice";
 
-interface props {
-  note: Note;
-  id: string;
-  onBlur: ()=>void
-  onClick: ()=>void
-}
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../state/store";
+import { updateTitle } from "../state/nodes/nodeSlice";
 
-function NoteTitle(props: props) {
-  const [title, setTitle] = useState(props.note.title);
+function NoteTitle() {
+  const selectedID = useSelector((state: RootState) => state.currentNote.id);
+  const title = useSelector(
+    (state: RootState) =>
+      state.nodes.filter((node) => node.id === selectedID)[0].title
+  );
   const dispatch = useDispatch();
-
-  const onChange = (val: string) => {
-    setTitle(val);
-    updateTitle(val);
-  };
-  const updateTitle = (val: string) => {
+  const updateNoteTitle = (val: string) => {
     dispatch(
-      updateNoteTitle({
-        id: props.id,
+      updateTitle({
+        id: selectedID,
         title: val,
       })
     );
   };
+  const onChange = (val: string) => {
+    updateNoteTitle(val);
+  };
+
   return (
     <input
       type="text"
       className="text-5xl bg-inherit font-extrabold focus:outline-none mb-4"
       onBlur={(e) => {
         onChange(e.target.value);
-        props.onBlur();
       }}
       onChange={(e) => {
         onChange(e.target.value);
       }}
-      onClick={props.onClick}
-      defaultValue={title}
+      value={title}
     />
   );
 }

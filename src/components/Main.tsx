@@ -3,7 +3,7 @@ import Editor from "./Editor";
 
 function Main() {
   return (
-    <div className="w-full flex gap-4 flex-col">
+    <div className="w-full flex-grow flex gap-4 flex-col">
       <Navbar />
       <Editor />
     </div>
