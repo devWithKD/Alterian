@@ -1,66 +1,104 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import NoteView from "./NoteView";
 // import { getNoteIDs } from "../state/notes/notesSlice";
 // import { getCollectionIDs } from "../state/collections/collectionsSlice";
 import CollectionView from "./CollectionView";
-import { ReactElement } from "react";
+// import { ReactElement } from "react";
+import {
+  getCollections,
+  getNotes,
+  updateParent,
+} from "../state/nodes/nodeSlice";
+import { Node, Note } from "../interface";
+import { createCollectionView, sortList } from "../utils/listHelper";
+import { useDrop } from "react-dnd";
+import { ItemTypes } from "../utils/itemTypes";
 import { RootState } from "../state/store";
-import { getCollectionIDs, getNoteIDs } from "../state/nodes/nodeSlice";
+import { useEffect, useState } from "react";
+
+interface dropID {
+  id: string;
+}
 
 function ListView() {
-  const rawNoteIDs = useSelector(getNoteIDs);
-  const rawCollectionIDs = useSelector(getCollectionIDs);
-  const focusID = useSelector((state:RootState)=>state.sidebarState.focusedID)
+  const collections = useSelector(getCollections);
+  const notes = useSelector(getNotes);
+  const rootExpandedState = useSelector(
+    (state: RootState) => state.sidebarState.expandedView
+  );
+  const dispatch = useDispatch();
+  const sortingMethod = useSelector(
+    (state: RootState) => state.sidebarState.sortType
+  );
 
-  const List: Array<ReactElement> = [];
+  const [, drop] = useDrop(() => ({
+    accept: ItemTypes.NODE_ITEM,
+    drop: (item: dropID) => {
+      dispatch(updateParent({ id: item.id, parentID: null }));
+    },
+  }));
 
-  // class listElement {
-  //   id: string
-  //   timeStamp : EpochTimeStamp
-  //   type: string
-  //   childeren: Array<string> | null
-  //   constructor(props){
-  //     this.id = props.id
-  //     this.timeStamp = props.timeStamp
-  //     this.type = props.type
-  //     this.childeren = props.childeren
-  //   }
-  // }
   const createListView = (
-    noteIDs: typeof rawNoteIDs,
-    collectionIDs: typeof rawCollectionIDs
+    collections: Array<Node>,
+    notes: Array<Note | Node>,
+    sortBy: string,
   ) => {
-    if (noteIDs.length == 0 && collectionIDs.length == 0) {
-      return;
-    } else {
-      if (noteIDs.length > 0)
-        noteIDs.map((noteID) =>
-          List.push(
-            <NoteView
-              noteID={noteID.id}
-              key={noteID.id}
-            />
-          )
-        );
-      if (collectionIDs.length > 0) {
-        collectionIDs.map((id) => {
-          List.push(
-            <CollectionView
-              collectionID={id.id}
-              key={id.id}
-              expand={false}
-              childerenIDs={[]}
-            />
-          );
-        });
-      }
-    }
+    const list: Array<Node | Note> = [];
+    const newCol = sortList(collections, sortBy);
+    newCol.forEach((col) => {
+      if (!col.parentID) list.push(col);
+    });
+    const newNotes = sortList(notes, sortBy);
+    newNotes.forEach((note) => {
+      if (!note.parentID) list.push(note as Note);
+    });
+    return list;
   };
 
-  createListView(rawNoteIDs, rawCollectionIDs);
+  const [list, setList] = useState(createListView(collections, notes, sortingMethod));
+
+  useEffect(() => {
+    setList(createListView(collections, notes, sortingMethod));
+  }, [collections, notes, sortingMethod]);
 
   return (
-    <div>{List.length > 0 ? List.map((element) => element) : "Empty"}</div>
+    <div className="flex flex-col h-full flex-grow">
+      {list.length > 0 ? (
+        <>
+          {list.map((element) => {
+            if (element.type == "collection") {
+              const childeren = createCollectionView(
+                collections,
+                notes,
+                element.id,
+                "z-a"
+              );
+
+              return (
+                <CollectionView
+                  collectionID={element.id}
+                  key={element.id}
+                  expand={rootExpandedState == "expanded" ? true : false}
+                  childeren={childeren}
+                  isChild={false}
+                />
+              );
+            } else {
+              return (
+                <NoteView
+                  noteID={element.id}
+                  key={element.id}
+                  isChild={false}
+                />
+              );
+            }
+          })}
+          <div className="flex flex-col h-full flex-grow" ref={drop}></div>
+        </>
+      ) : (
+        "Empty"
+      )}
+    </div>
   );
 }
 

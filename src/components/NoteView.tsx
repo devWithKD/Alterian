@@ -6,12 +6,16 @@ import { setCurrentNote } from "../state/currentNote/currentNoteSlice";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../utils/itemTypes";
 import { updateTitle } from "../state/nodes/nodeSlice";
+import React from "react";
 
 interface props {
   noteID: string;
+  isChild: boolean;
 }
 
 function NoteView(props: props) {
+  console.log(props.noteID);
+
   const title = useSelector((state: RootState) => {
     return state.nodes.filter((node) => node.id === props.noteID)[0].title;
   });
@@ -39,7 +43,7 @@ function NoteView(props: props) {
   };
 
   const [, drag] = useDrag(() => ({
-    type: ItemTypes.NOTE_ITEM,
+    type: ItemTypes.NODE_ITEM,
     item: { id: props.noteID },
   }));
 
@@ -48,7 +52,7 @@ function NoteView(props: props) {
   return (
     <div ref={drag}>
       <div
-        className={`py-1 ps-8 ${
+        className={`py-1 ${!props.isChild ? "ps-8" : "px-4"}  ${
           isEditable ? "outline outline-2" : ""
         } rounded hover:bg-slate-200`}
         contentEditable={isEditable}
@@ -68,4 +72,6 @@ function NoteView(props: props) {
   );
 }
 
-export default NoteView;
+const NoteViewMemoized = React.memo(NoteView)
+
+export default NoteViewMemoized;

@@ -52,7 +52,7 @@ const nodesSlice = createSlice({
     },
     updateParent: (
       state,
-      action: PayloadAction<{ id: string; parentID: string }>
+      action: PayloadAction<{ id: string; parentID: string|null }>
     ) => {
       return state.map((node) => {
         if (node.id == action.payload.id) {
@@ -105,19 +105,21 @@ const nodesSlice = createSlice({
   },
 });
 
-const selectNotes = (state: RootState) =>
-  state.nodes.filter((node) => node.type == "note");
+const selectNode = (state: RootState) => state.nodes;
 
-export const getNoteIDs = createSelector([selectNotes], (notes) =>
+export const getNoteIDs = createSelector([selectNode], (notes) =>
   notes.map((note) => ({ id: note.id }))
 );
 
-const selectCollection = (state: RootState) =>
-  state.nodes.filter((node) => node.type == "collection");
+export const getNotes = createSelector([selectNode], (notes) => {
+  return notes.filter((note) => note.type == "note");
+});
 
-export const getCollectionIDs = createSelector(
-  [selectCollection],
-  (collections) => collections.map((collection) => ({ id: collection.id }))
+export const getCollectionIDs = createSelector([selectNode], (collections) =>
+  collections.map((collection) => ({ id: collection.id }))
+);
+export const getCollections = createSelector([selectNode], (colls) =>
+  colls.filter((col) => col.type == "collection")
 );
 
 export const {

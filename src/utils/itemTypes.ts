@@ -1,4 +1,4 @@
 export const ItemTypes = {
-  NOTE_ITEM: "note-item",
+  NODE_ITEM: "node-item",
   COLLECTION_ITEM: "collection-item",
 };

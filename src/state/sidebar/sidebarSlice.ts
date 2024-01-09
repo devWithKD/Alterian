@@ -1,14 +1,11 @@
 import { 
-  // PayloadAction, 
   createSlice, 
-  // createSelector 
 } from "@reduxjs/toolkit";
 import { SideBarState } from "../../interface";
-// import { RootState } from "../store";
 
 const initialState: SideBarState = {
   focusedID: "",
-  sortType: "A-Z",
+  sortType: "a-z",
   expandedView: "inherit",
 };
 
