@@ -5,9 +5,11 @@ import tagsReducer from "./tags/tagsSclice";
 import currentNoteReducer from "./currentNote/currentNoteSlice";
 import sidebarStateReducer from "./sidebar/sidebarSlice";
 import nodesReducer from "./nodes/nodeSlice"
+import userReducer from './user/userSlice'
 
 export const store = configureStore({
   reducer: {
+    authorised_user: userReducer,
     nodes: nodesReducer,
     // notes: notesReducer,
     tags: tagsReducer,

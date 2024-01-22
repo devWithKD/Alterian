@@ -3,8 +3,8 @@ export interface Node {
   title: string;
   createdTime: EpochTimeStamp;
   updatedTime: EpochTimeStamp;
-  type: string|null;
-  parentID: string|null
+  type: string | null;
+  parentID: string | null;
 }
 
 export interface Note extends Node {
@@ -23,7 +23,7 @@ export interface SideBarState {
   expandedView: string;
 }
 
-export interface NodeState extends Array<Node|Note> {}
+export interface NodeState extends Array<Node | Note> {}
 
 export interface NotesState extends Array<Note> {}
 
@@ -33,3 +33,12 @@ export interface SelectedNote {
   id: string;
 }
 
+export type UserState = {
+  data: {
+    email: string | undefined;
+    firstName: string | undefined;
+    lastName: string | undefined;
+    provider: string | null | undefined;
+    id: string | null | undefined;
+  } | null;
+};

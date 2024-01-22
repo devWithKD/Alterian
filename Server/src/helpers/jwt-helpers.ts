@@ -1,30 +1,30 @@
 import { Request, Response, NextFunction } from "express";
-import { UserType } from "../model/user.model";
 import jwt, { Secret, VerifyErrors } from "jsonwebtoken";
 import createHttpError from "http-errors";
 const ACCESS_SECRET = process.env.ACCESS_SECRET as Secret;
 const REFRESH_SECRET = process.env.REFRESH_SECRET as Secret;
 
-export const verifyAccessToken = (req: any, res: any, next: NextFunction) => {
-  if (!req.cookies.jwt) next(createHttpError.Unauthorized());
-  const token = req.cookies.jwt;
+export const verifyAccessToken = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.cookies.access_token) next(createHttpError.Unauthorized());
+  const token = req.cookies.access_token;
   jwt.verify(token, ACCESS_SECRET, (err: VerifyErrors | null, payload: any) => {
     if (err) {
       err.name === "JsonWebTokenError"
         ? next(createHttpError.Unauthorized())
         : next(createHttpError.Unauthorized(err.message));
     }
-    req.payload = payload;
-    next()
+    req.tokenPayload = payload;
+    next();
   });
 };
 
-export const signAccessToken = (user: UserType) => {
+export const signAccessToken = (userID: string, expires: number|string) => {
   return new Promise((resolve, reject) => {
+    
     jwt.sign(
-      { data: user },
+      { data: userID },
       ACCESS_SECRET,
-      { expiresIn: 60 * 1000 * 10 },
+      { expiresIn: expires },
       (err, token) => {
         if (err) {
           console.log(err);
@@ -36,11 +36,11 @@ export const signAccessToken = (user: UserType) => {
   });
 };
 
-export const signRefreshToken = (user: UserType) => {
+export const signRefreshToken = (userID: string) => {
   return new Promise((resolve, reject) => {
     jwt.sign(
       {
-        data: user,
+        data: userID,
       },
       REFRESH_SECRET,
       { expiresIn: "5d" },
