@@ -1,3 +1,5 @@
+import { AxiosError, AxiosResponse } from "axios";
+
 export interface Node {
   id: string;
   title: string;
@@ -42,3 +44,13 @@ export type UserState = {
     id: string | null | undefined;
   } | null;
 };
+
+export interface ResponseError {
+  error: {
+    status: number;
+    message: string;
+  };
+}
+
+export type AxiosSuccessCB = (res: AxiosResponse) => void;
+export type AxiosFailuerCB = (res: AxiosError) => void;

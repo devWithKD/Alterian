@@ -1,5 +1,12 @@
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../state/store";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { AxiosFailuerCB, AxiosSuccessCB, ResponseError } from "../interface";
+import { updateUser } from "../state/user/userSlice";
+import axios from "axios";
 
 function Login() {
   const loginWithGoogle = () => {
@@ -35,6 +42,45 @@ function Login() {
 
     window.location.assign(githubOAuthURL);
   };
+
+  const user = useSelector((state: RootState) => state.authorised_user.data);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const setUser: AxiosSuccessCB = (res) => {
+      if (res.status == 200) {
+        dispatch(updateUser({ data: res.data }));
+        navigate("/");
+        return;
+      }
+    };
+    const errorHandler: AxiosFailuerCB = async (err) => {
+      const errorData = err.response?.data as ResponseError;
+      console.log(errorData);
+      if (errorData.error.message && errorData.error.message == "jwt expired") {
+        console.log(errorData.error.message);
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_AUTH_URL}/refresh-token`,
+          {
+            withCredentials: true,
+          }
+        );
+        if (res.status === 200) {
+          navigate("/");
+          return;
+        }
+      }
+    };
+    if (!user) {
+      axios
+        .get(`${import.meta.env.VITE_ALTERIAN_API_V1}/userinfo`, {
+          withCredentials: true,
+        })
+        .then(setUser)
+        .catch(errorHandler);
+    }
+  }, []);
 
   return (
     <div className="w-screen h-screen bg-zinc-50 flex items-center justify-center">

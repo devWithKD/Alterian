@@ -9,3 +9,9 @@ export interface GoogleProfileRequest extends Request{
 export interface GithubProfileRequest extends Request{
   user: passportGithub.Profile
 }
+
+export interface TokenPayload {
+  data: string,
+  iat: number,
+  exp: number
+}

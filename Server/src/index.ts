@@ -3,7 +3,7 @@ import express, { Request, Response, NextFunction } from "express";
 import api from "./routes/api";
 import auth from "./routes/auth";
 import { verifyAccessToken } from "./helpers/jwt-helpers";
-import "./config/database";
+import "./config/mongodb";
 import cors from "cors";
 import createHttpError, { HttpError } from "http-errors";
 import cookieParser from "cookie-parser";
@@ -24,9 +24,9 @@ const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  if (err.statusCode == 401) {
-    res.clearCookie("access_token").clearCookie("refresh_token");
-  }
+  // if (err.statusCode == 401) {
+  //   res.clearCookie("access_token").clearCookie("refresh_token");
+  // }
 
   res.status(err.status).send({
     error: {
