@@ -1,0 +1,22 @@
+version: "3.1"
+
+services:
+  mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${USER_NAME}"
+      MONGO_INITDB_ROOT_PASSWORD: "${PASSWORD}"
+    ports:
+      - 27017:27017
+    volumes:
+      - ./vols:/data/db
+    env_file:
+      - .env
+    restart: always
+  redis: 
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./vols:/data/db
+    restart: always
