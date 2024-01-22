@@ -1,4 +1,4 @@
-import useCreateNewNote from "../utils/useCreateNewNote";
+import useCreateNewNote from "../react-hooks/useCreateNewNote";
 
 function NoteCreator() {
   const createNote = useCreateNewNote();

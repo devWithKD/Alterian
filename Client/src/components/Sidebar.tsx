@@ -3,8 +3,8 @@ import { AiOutlineMenu } from "react-icons/ai";
 import { MdOutlineNoteAdd, MdOutlineSort } from "react-icons/md";
 import { LuFolderPlus } from "react-icons/lu";
 import { BiCollapseVertical, BiExpandVertical } from "react-icons/bi";
-import useCreateNewNote from "../utils/useCreateNewNote";
-import useCreateCollection from "../utils/useCreateCollection";
+import useCreateNewNote from "../react-hooks/useCreateNewNote";
+import useCreateCollection from "../react-hooks/useCreateCollection";
 import ListView from "./ListView";
 import { useDispatch, useSelector } from "react-redux";
 import {
