@@ -10,7 +10,7 @@ const REFRESH_SECRET = process.env.REFRESH_SECRET as Secret;
 export const verifyAccessToken = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.cookies.access_token) next(createHttpError.Unauthorized());
   const token = req.cookies.access_token;
@@ -37,7 +37,7 @@ export const signAccessToken = (userID: string, expires: number | string) => {
           return reject(createHttpError.InternalServerError());
         }
         resolve(token);
-      }
+      },
     );
   });
 };
@@ -62,7 +62,7 @@ export const signRefreshToken = (userID: string) => {
           .catch(() => {
             return reject(createHttpError.InternalServerError());
           });
-      }
+      },
     );
   });
 };
@@ -77,11 +77,28 @@ export const verifyRefreshToken = async (token: string): Promise<string> => {
         .get(userID as string)
         .then((result) => {
           if (result === token) return resolve(userID as string);
-          reject(createHttpError.Unauthorized('Refresh Token Expired'));
+          reject(createHttpError.Unauthorized("Refresh Token Expired"));
         })
         .catch((err) => {
-          reject(createHttpError.Unauthorized('Refresh Token Not Found'));
+          reject(createHttpError.Unauthorized("Refresh Token Not Found"));
         });
+    });
+  });
+};
+
+export const invalidateRefreshToken = async (token: string): Promise<null> => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, REFRESH_SECRET, (err, payload) => {
+      if (err) return reject(createHttpError.Unauthorized(err.message));
+      const userId = (payload as TokenPayload).data;
+      redisClient
+        .del(userId as string)
+        .then(() => {
+          resolve(null);
+        })
+        .catch(() =>
+          reject(createHttpError.Unauthorized("Refresh Token Not Found")),
+        );
     });
   });
 };

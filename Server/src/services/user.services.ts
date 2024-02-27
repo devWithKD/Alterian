@@ -1,6 +1,5 @@
 import axios from "axios";
 import { User } from "../model/user.model";
-
 // Export a function to get the Google Token
 export const getTokenGoogle = async (code: any) => {
   // Get the Google Token API URL from the environment variable
@@ -58,7 +57,7 @@ export const getGoogleUser = async ({
       `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
       {
         headers: { Authorization: `Bearer ${id_token}` },
-      }
+      },
     );
     // Return the response data as the Google User Result
     return res.data as GoogleUserResult;
@@ -119,7 +118,7 @@ interface githubEmail {
 
 // Export a function to get the Github User
 export const getGithubUser = async (
-  token: string
+  token: string,
 ): Promise<GithubUserResult> => {
   try {
     // Make a request to the Github API to get the user's emails
@@ -137,7 +136,7 @@ export const getGithubUser = async (
 
     // Find the primary email in the user's emails
     const userEmail: githubEmail = email.data.find(
-      (_email: githubEmail) => _email.primary === true
+      (_email: githubEmail) => _email.primary === true,
     );
 
     // Create the user data object
@@ -175,7 +174,7 @@ export const findOneOrCreateUser = async (userObj: any, provider: string) => {
 
     // Return the new user
     return await newUser.save();
-  } else {
+  } else  {
     // Get the user's name from the name string
     const userName = userObj.name.split(" ");
     const newUser = new User({
@@ -186,6 +185,12 @@ export const findOneOrCreateUser = async (userObj: any, provider: string) => {
       authID: userObj.id,
     });
     // Return the new user
-    return await newUser.save()
-  }
+    return await newUser.save();
+  } 
+};
+
+export const checkExistingUserByEmail = async (emailString: string) => {
+  const user = await User.findOne({ email: emailString });
+  if (!user) return false;
+  return true;
 };

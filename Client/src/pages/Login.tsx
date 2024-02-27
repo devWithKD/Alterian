@@ -3,12 +3,27 @@ import { FaGithub } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../state/store";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AxiosFailuerCB, AxiosSuccessCB, ResponseError } from "../interface";
 import { updateUser } from "../state/user/userSlice";
 import axios from "axios";
+import { checkValidEmail } from "../utils/authHelpers";
+import AuthContainer from "../components/auth/AuthContainer";
 
 function Login() {
+  const [emailError, setEmailError] = useState(false);
+  //  const checkEmail = (data:string)=>{
+  //    axios({
+  //      method: "post",
+  //      url: `${import.meta.env.VITE_BACKEND_AUTH_URL}/check-email`,
+  //      data: { email: email },
+  //    })
+  //      .then((res) => {
+  //        if (res.status == 200)
+  //        navigate("/email-login", { state: { email: email } });
+  //      })
+  //      .catch(() => navigate("/email-signup", { state: { email: email } }));
+  //  }
   const loginWithGoogle = () => {
     const options = {
       redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_ROUTE,
@@ -47,11 +62,34 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    checkValidEmail(e)
+      .then((email) => {
+        axios({
+          method: "post",
+          url: `${import.meta.env.VITE_BACKEND_AUTH_URL}/check-email`,
+          data: { email: email },
+        })
+          .then((res) => {
+            if (res.status == 200)
+              document.startViewTransition(() =>
+                navigate("/email-login", { state: { email: email } }),
+              );
+          })
+          .catch(() =>
+            document.startViewTransition(() =>
+              navigate("/email-signup", { state: { email: email } }),
+            ),
+          );
+      })
+      .catch(() => setEmailError(true));
+  };
+
   useEffect(() => {
     const setUser: AxiosSuccessCB = (res) => {
       if (res.status == 200) {
         dispatch(updateUser({ data: res.data }));
-        navigate("/");
+        document.startViewTransition(() => navigate("/"));
         return;
       }
     };
@@ -64,10 +102,10 @@ function Login() {
           `${import.meta.env.VITE_BACKEND_AUTH_URL}/refresh-token`,
           {
             withCredentials: true,
-          }
+          },
         );
         if (res.status === 200) {
-          navigate("/");
+          document.startViewTransition(() => navigate("/"));
           return;
         }
       }
@@ -83,10 +121,9 @@ function Login() {
   }, []);
 
   return (
-    <div className="w-screen h-screen bg-zinc-50 flex items-center justify-center">
-      <div className="p-7 w-96 bg-white shadow-lg rounded-md grid grid-cols-1 divide-y-2">
-        <div className="flex flex-col my-4 items-center justify-center gap-4">
-          <h1 className="text-6xl mb-6 font-black text-center ">Log In</h1>
+    <AuthContainer title="Welcome">
+      <div className="w-full grid grid-cols-1 divide-y-2">
+        <div className="flex flex-col mb-4 items-center justify-center gap-4">
           <button
             className="p-2 w-full flex gap-3 bg-white items-center outline outline-1 outline-gray-400 justify-center rounded-md font-semibold"
             onClick={loginWithGoogle}
@@ -102,10 +139,13 @@ function Login() {
             Continue with Github
           </button>
         </div>
-        <form className="flex w-full flex-col items-center justify-center gap-4 pt-4">
+        <form
+          className="flex w-full flex-col items-center justify-center gap-4 pt-4"
+          onSubmit={onSubmitHandler}
+        >
           <label
             htmlFor="login-email"
-            className="flex w-full flex-col gap-2 text-sm text-gray-500"
+            className={`flex w-full flex-col gap-2 text-sm text-gray-500`}
           >
             Email
             <input
@@ -113,19 +153,24 @@ function Login() {
               name="email"
               id="login-email"
               placeholder="Enter your email address..."
-              className="px-2 py-1 block w-full h-8 outline outline-1 outline-gray-300 rounded bg-gray-100"
+              className={`px-2 py-1 block w-full h-8 outline outline-1 outline-gray-300 rounded bg-gray-100 ${emailError ? "border-2 border-red-700" : ""}`}
               autoComplete="email"
             />
+            {emailError ? (
+              <p className="text-red-700 text-xs">Please Enter Valid Email</p>
+            ) : (
+              ""
+            )}
           </label>
           <button
             type="submit"
-            className="p-2 w-full bg-black rounded-md text-white font-semibold"
+            className="p-2 w-full bg-black rounded-md text-white font-semibold active:bg-gray-700 transition-all"
           >
             Continue with email
           </button>
         </form>
       </div>
-    </div>
+    </AuthContainer>
   );
 }
 
