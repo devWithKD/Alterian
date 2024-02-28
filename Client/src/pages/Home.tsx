@@ -31,11 +31,12 @@ function Home() {
         })
         .catch((err: AxiosError) => {
           const errorData = err.response?.data as ResponseError;
+          if (!errorData) {
+            console.log(err.message);
+            document.startViewTransition(() => navigate("/login"));
+          }
           console.log(errorData);
-          if (
-            errorData.error.message &&
-            errorData.error.message == "jwt expired"
-          ) {
+          if (errorData.error.message == "jwt expired") {
             console.log(errorData.error.message);
             axios
               .get(`${import.meta.env.VITE_BACKEND_AUTH_URL}/refresh-token`, {
@@ -43,17 +44,17 @@ function Home() {
               })
               .then((res) => {
                 if (res.status !== 200) {
-                  navigate("/login");
+                  document.startViewTransition(() => navigate("/login"));
                   return;
                 }
-                navigate("/");
+                document.startViewTransition(() => navigate("/"));
               })
               .catch((err) => {
                 console.log(err.message);
-                navigate("/login");
+                document.startViewTransition(() => navigate("/login"));
               });
           } else {
-            navigate("/login");
+            document.startViewTransition(() => navigate("/login"));
           }
         });
     }

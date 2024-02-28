@@ -4,17 +4,25 @@ import {
   getGoogleUser,
   getTokenGithub,
   getTokenGoogle,
+  findOneOrCreateUser,
+  checkExistingUserByEmail,
 } from "../services/user.services";
-import { signAccessToken, signRefreshToken } from "../helpers/jwt-helpers";
+import { User } from "../model/user.model";
+import {
+  invalidateRefreshToken,
+  signAccessToken,
+  signRefreshToken,
+} from "../helpers/jwt-helpers";
 import createHttpError from "http-errors";
-import { findOneOrCreateUser } from "../services/user.services";
 import { accessCookieOps, refreshCookieOps } from "../helpers/cookie-helpers";
+import { v4 as uuid } from "uuid";
+import bcrypt from "bcrypt";
 
 // Export a function called googleOAuthController which takes in a request, response and nextFunction as parameters
 export const googleOAuthController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // If the request body does not contain a code, log an error and call the next function with a BadRequest error
   if (!req.body.code) {
@@ -54,7 +62,7 @@ export const googleOAuthController = async (
 export const githubAuthController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // If the request body does not contain a code, log an error and call the next function with a BadRequest error
   if (!req.body.code) {
@@ -88,4 +96,109 @@ export const githubAuthController = async (
     provider: user.provider,
     id: user.id,
   });
+};
+
+export const checkEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  console.log(req.body);
+  const result = await checkExistingUserByEmail(req.body.email);
+  if (result) res.sendStatus(200);
+  else res.status(404).send("User does not exist");
+};
+
+export const signUpWithEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.body.email)
+    next(createHttpError.BadRequest("Credentials not found!"));
+  const data = req.body;
+
+  const user = await User.findOne({ email: data.email });
+  if (user) {
+    next(
+      createHttpError.BadRequest("User with same email address alredy exists"),
+    );
+    return;
+  } else {
+    const authId = uuid();
+    const hashedPass = await bcrypt.hash(data.password, 11);
+    const newUser = new User({
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      authID: authId,
+      password: hashedPass,
+      provider: "emailAuth",
+    });
+    const savedUser = await newUser.save();
+
+    const accessToken = await signAccessToken(savedUser.id, "5h");
+    // Sign the refresh token from the signRefreshToken function
+    const refreshToken = await signRefreshToken(savedUser.id);
+    // Set the access token and refresh token in the response cookies with the accessCookieOps and refreshCookieOps
+    res.cookie("access_token", accessToken, accessCookieOps);
+    res.cookie("refresh_token", refreshToken, refreshCookieOps);
+    // Return a json object containing the user's email, first name, last name, provider and id
+    res.json({
+      email: savedUser.email,
+      firstName: savedUser.firstName,
+      lastName: savedUser.lastName,
+      provider: savedUser.provider,
+      id: savedUser.id,
+    });
+  }
+};
+
+export const loginWithEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.body.email)
+    next(createHttpError.BadRequest("Credentials not found!"));
+  const data = req.body;
+  const user = await User.findOne({ email: data.email, provider: "emailAuth" });
+  if (!user) {
+    next(createHttpError.NotFound("Invalid Credentials"));
+    return;
+  }
+  const hasMatch = await user.hasValidPass(data.password);
+  if (!hasMatch) {
+    next(createHttpError.NotFound("Invalid Credentials"));
+    return;
+  }
+  const accessToken = await signAccessToken(user.id, "5h");
+  // Sign the refresh token from the signRefreshToken function
+  const refreshToken = await signRefreshToken(user.id);
+  // Set the access token and refresh token in the response cookies with the accessCookieOps and refreshCookieOps
+  res.cookie("access_token", accessToken, accessCookieOps);
+  res.cookie("refresh_token", refreshToken, refreshCookieOps);
+  // Return a json object containing the user's email, first name, last name, provider and id
+  res.json({
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    provider: user.provider,
+    id: user.id,
+  });
+};
+
+export const logOut = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.cookies.refresh_token) next(createHttpError.Unauthorized());
+  const token = req.cookies.refresh_token;
+  invalidateRefreshToken(token)
+    .then(() => {
+      res.clearCookie("access_token").clearCookie("refresh_token");
+      res.send(200)
+    })
+    .catch((err) => next(err));
 };

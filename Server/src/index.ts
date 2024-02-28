@@ -24,9 +24,9 @@ const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  // if (err.statusCode == 401) {
-  //   res.clearCookie("access_token").clearCookie("refresh_token");
-  // }
+   if (err.statusCode == 401) {
+     res.clearCookie("access_token").clearCookie("refresh_token");
+   }
 
   res.status(err.status).send({
     error: {
