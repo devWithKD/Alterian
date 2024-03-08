@@ -17,7 +17,6 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-
 const errorHandler = (
   err: HttpError,
   req: Request,
